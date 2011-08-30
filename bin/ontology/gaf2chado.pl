@@ -1313,6 +1313,7 @@ my ( $dsn, $user, $password, $config, $log_file, $logger );
 my ( $dicty, $prune );
 my $commit_threshold = 1000;
 my $attr = { AutoCommit => 1 };
+my @sources_filter = ();
 
 GetOptions(
     'h|help'                => sub { pod2usage(1); },
@@ -1324,6 +1325,7 @@ GetOptions(
     'ct|commit_threshold:s' => \$commit_threshold,
     'dicty'                 => \$dicty,
     'a|attr:s%{1,}'         => \$attr,
+    'sources_filter=s'      => \@sources_filter,
     'prune'                 => \$prune
 );
 
@@ -1409,6 +1411,8 @@ if ($dicty) {    #dicty specific
 
 ANNOTATION:
 for my $anno (@$all_anno) {
+    next unless grep { $anno->source->id eq $_ } @sources_filter;
+
     $manager->annotation($anno);
     if (!(      $manager->find_annotated
             and $manager->find_term
