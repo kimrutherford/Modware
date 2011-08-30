@@ -1355,6 +1355,8 @@ else {
 
 my $schema = Bio::Chado::Schema->connect( $dsn, $user, $password, $attr );
 
+my $guard = $schema->txn_scope_guard;
+
 my $helper = GAFHelper->new( chado => $schema );
 my $manager = GAFManager->new( helper => $helper );
 my $loader = GAFLoader->new( manager => $manager );
@@ -1495,6 +1497,8 @@ if ( $manager->entries_in_cache ) {
 $logger->info(
     "Annotations >> Processed:$anno_count Loaded:$loaded  Updated:$updated");
 $logger->info("Update-skipped:$update_skipped Loading-skipped:$skipped");
+
+$guard->commit();
 
 =head1 NAME
 
